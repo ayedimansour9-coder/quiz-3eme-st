@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Génie Électrique - 3ème ST</title>
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            --card-bg: rgba(30, 41, 59, 0.95);
+            --border-color: #334155;
+            --accent-color: #facc15;
+            --text-main: #f8fafc;
+            --text-sub: #94a3b8;
+            --timer-bg: #be123c;
+            --btn-bg: #334155;
+            --btn-hover: #0284c7;
+            --btn-border: #38bdf8;
+        }
+
+        body.pcb-theme {
+            --bg-gradient: linear-gradient(135deg, #022c22 0%, #064e3b 100%);
+            --card-bg: rgba(2, 44, 34, 0.95);
+            --border-color: #065f46;
+            --accent-color: #f59e0b;
+            --timer-bg: #b91c1c;
+            --btn-bg: #065f46;
+            --btn-hover: #059669;
+            --btn-border: #34d399;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 15px;
+            transition: background 0.5s ease;
+        }
+
+        .card {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+            border: 1px solid var(--border-color);
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+            transition: all 0.5s ease;
+        }
+
+        .header-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            font-size: 15px;
+            color: var(--text-sub);
+            font-weight: bold;
+        }
+
+        .timer {
+            background: var(--timer-bg);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 16px;
+        }
+
+        .sound-btn {
+            background: transparent;
+            border: 1px solid var(--text-sub);
+            color: var(--text-main);
+            padding: 5px 10px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        h3 {
+            color: var(--accent-color);
+            font-size: 20px;
+            margin-bottom: 25px;
+            line-height: 1.4;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            background: var(--btn-bg);
+            color: var(--text-main);
+            border: 2px solid transparent;
+            padding: 14px;
+            margin: 10px 0;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            text-align: left;
+        }
+
+        .btn:hover {
+            background: var(--btn-hover);
+            border-color: var(--btn-border);
+            transform: translateY(-2px);
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 14px;
+            margin: 15px 0;
+            border-radius: 10px;
+            border: 2px solid var(--border-color);
+            background: #0f172a;
+            color: white;
+            font-size: 18px;
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        .footer-credit {
+            margin-top: 20px;
+            font-size: 12px;
+            color: var(--text-sub);
+        }
+    </style>
+</head>
+<body>
+    <div class="card" id="quiz-card">
+        <div class="header-info">
+            <span id="q-number">Question 1 / 20</span>
+            <button class="sound-btn" id="sound-toggle" onclick="toggleSound()">🔊 Son: On</button>
+            <span class="timer" id="timer">⏱️ 15s</span>
+        </div>
+        <h3 id="question">Chargement...</h3>
+        <div id="options"></div>
+        <div class="footer-credit">⚡ Quiz Génie Électrique - 3ème ST ⚡</div>
+    </div>
+
+    <script>
+        const questions = [
+            // --- Partie 1 : Logique Combinatoire ---
+            {
+                q: "D'après les propriétés des fonctions logiques, que vaut a + a barre (a + ā) ?",
+                options: ["0", "a", "ā", "1"],
+                correct: 3,
+                time: 15,
+                points: 10,
+                type: "qcm",
+                theme: "logic"
+            },
+            {
+                q: "Selon le théorème de De Morgan, à quoi est égale l'expression (a + b) barre ?",
+                options: ["ā + b̄", "ā . b̄", "a . b", "a + b"],
+                correct: 1,
+                time: 15,
+                points: 10,
+                type: "qcm",
+                theme: "logic"
+            },
+            {
+                q: "En algèbre de Boole, que vaut la simplification de l'expression : S = a + a . b ?",
+                options: ["b", "a . b", "a", "1"],
+                correct: 2,
+                time: 15,
+                points: 10,
+                type: "qcm",
+                theme: "logic"
+            },
+            {
+                q: "Pour une porte logique OU exclusif (XOR) à deux entrées, que vaut la sortie si les deux entrées sont identiques (a = 1 et b = 1) ?",
+                options: ["1", "0", "ā", "Z"],
+                correct: 1,
+                time: 15,
+                points: 10,
+                type: "qcm",
+                theme: "logic"
+            },
+            {
+                q: "Pour une porte logique ET (AND) à deux entrées a et b, que vaut la sortie S si a = 1 et b = 0 ?",
+                options: ["1", "0", "a", "b"],
+                correct: 1,
+                time: 15,
+                points: 10,
+                type: "qcm",
+                theme: "logic"
+            },
+            {
+                q: "En algèbre de Boole, que vaut le produit logique a . 0 ?",
+                options: ["1", "a", "ā", "0"],
+                correct: 3,
+                time: 15,
+                points: 10,
+                type: "qcm",
+                theme: "logic"
+            },
+            {
+                q: "Pour une porte logique OU (OR) à deux entrées, que vaut la sortie S si a = 0 et b = 0 ?",
+                options: ["1", "0", "1 ou 0 selon l'horloge", "Indéterminé"],
+                correct: 1,
+                time: 15,
+                points: 10,
+                type: "qcm",
+                theme: "logic"
+            },
+            {
+                q: "Quel circuit intégré de la famille TTL permet de réaliser la fonction NON-OU (NOR) ?",
+                options: ["7400", "7402", "4001", "7486"],
+                correct: 1,
+                time: 15,
+                points: 10,
+                type: "qcm",
+                theme: "logic"
+            },
+            {
+                q: "⚡ SPEED (10s) : Quel est le circuit intégré de la famille CMOS qui réalise la fonction NON-ET (NAND) ?",
+                options: ["4001", "4011", "7400", "4077"],
+                correct: 1,
+                time: 10,
+                points: 15,
+                type: "qcm",
+                theme: "logic"
+            },
+            {
+                q: "⚡ SPEED (10s) : Quel est le rôle principal du circuit intégré 7442 dans les systèmes combinatoires ?",
+                options: ["Codeur de priorité décimal vers BCD", "Décodeur BCD vers décimal (4 vers 10 lignes)", "Multiplexeur 8 vers 1 ligne", "Additionneur complet"],
+                correct: 1,
+                time: 10,
+                points: 15,
+                type: "qcm",
+                theme: "logic"
+            },
+            // --- Partie 2 : Microcontrôleur & MikroC ---
+            {
+                q: "En langage MikroC, quel est le rôle de la fonction principale void main() ?",
+                options: ["Déclarer les variables globales", "Configurer uniquement le quartz", "Arrêter l'exécution après un tour", "C'est le point de départ où commence l'exécution du programme"],
+                correct: 3,
+                time: 15,
+                points: 10,
+                type: "qcm",
+                theme: "mcu"
+            },
+            {
+                q: "À quoi servent les broches 11 et 12 (oscillateur / quartz) sur un microcontrôleur PIC16F84A ?",
+                options: ["Alimenter en +5V", "Gérer les E/S du PORTB", "Brancher l'horloge externe (quartz)", "Assurer le Reset"],
+                correct: 2,
+                time: 15,
+                points: 10,
+                type: "qcm",
+                theme: "mcu"
+            },
+            {
+                q: "Sur le microcontrôleur PIC16F84A, à quoi servent les broches 5 (VSS) et 14 (VDD) ?",
+                options: ["Les E/S du PORTB", "L'oscillateur", "L'alimentation du microcontrôleur (0V et +5V)", "Le reset (MCLR)"],
+                correct: 2,
+                time: 15,
+                points: 10,
+                type: "qcm",
+                theme: "mcu"
+            },
+            {
+                q: "Comment appelle-t-on la mémoire morte, programmable et effaçable électriquement dans un système ?",
+                options: ["RAM", "EEPROM", "Registre de travail", "Compteur du programme"],
+                correct: 1,
+                time: 15,
+                points: 10,
+                type: "qcm",
+                theme: "mcu"
+            },
+            {
+                q: "Quel est le rôle principal du registre TRISA dans un microcontrôleur PIC ?",
+                options: ["Stocker le résultat", "Configurer les broches du PORTA en entrée ou en sortie", "Sauvegarder le programme", "Rythmer le cycle"],
+                correct: 1,
+                time: 15,
+                points: 10,
+                type: "qcm",
+                theme: "mcu"
+            },
+            {
+                q: "En MikroC, quel opérateur de manipulation de bits utilise-t-on pour faire un 'ET bit à bit' (AND bitwise) ?",
+                options: ["&&", "||", "&", "|"],
+                correct: 2,
+                time: 15,
+                points: 10,
+                type: "qcm",
+                theme: "mcu"
+            },
+            {
+                q: "Dans le compilateur MikroC Pro, par quel préfixe commence-t-on un nombre écrit en base Hexadécimale (base 16) ?",
+                options: ["0b", "0x", "0", "0h"],
+                correct: 1,
+                time: 15,
+                points: 10,
+                type: "qcm",
+                theme: "mcu"
+            },
+            {
+                q: "En MikroC, comment initialise-t-on généralement un port (par exemple PORTB) en tant que sorties ?",
+                options: ["En mettant TRISB = 0xFF", "En configurant TRISB = 0x00 (sorties) puis en écrivant dans PORTB", "En utilisant main()", "En activant le convertisseur"],
+                correct: 1,
+                time: 15,
+                points: 10,
+                type: "qcm",
+                theme: "mcu"
+            },
+            {
+                q: "⚡ SPEED (10s) : En langage MikroC, quelle syntaxe permet d'écrire une boucle infinie et une pause de 500 millisecondes ?",
+                options: ["for(1) et Pause_ms(500);", "while(1) et Delay_ms(500);", "if(1) et Delay_us(500);", "while(0) et Delay_ms(500);"],
+                correct: 1,
+                time: 10,
+                points: 15,
+                type: "qcm",
+                theme: "mcu"
+            },
+            {
+                q: "🔥 BOSS FINAL (20s) [Écriture libre] : En MikroC, quel mot-clé doit-on obligatoirement placer à la fin de chaque cas (case) dans une structure switch ?",
+                correctText: ["break;", "break"],
+                time: 20,
+                points: 20,
+                type: "text",
+                theme: "mcu"
+            }
+        ];
+
+        let currentIdx = 0;
+        let score = 0;
+        let timeLeft = 15;
+        let timerInterval;
+        let soundEnabled = true;
+        let audioCtx = null;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        function playBeep(freq = 400, type = 'sine', duration = 0.1) {
+            if (!soundEnabled) return;
+            try {
+                initAudio();
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+                let osc = audioCtx.createOscillator();
+                let gain = audioCtx.createGain();
+                osc.type = type;
+                osc.frequency.value = freq;
+                gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + duration);
+            } catch(e) {}
+        }
+
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            document.getElementById('sound-toggle').innerText = soundEnabled ? "🔊 Son: On" : "🔇 Son: Off";
+        }
+
+        function updateTheme(theme) {
+            if (theme === 'mcu') {
+                document.body.classList.add('pcb-theme');
+            } else {
+                document.body.classList.remove('pcb-theme');
+            }
+        }
+
+        function loadQuestion() {
+            clearInterval(timerInterval);
+            if (currentIdx >= questions.length) {
+                document.body.classList.remove('pcb-theme');
+                let message = score >= 180 ? "🔥 M3allem! Génie Électrique mrigel m3ak bel gda!" : (score >= 120 ? "👍 Mouch khayeb, ama tnajem t7ssen!" : "😅 Lazmek ta3mel talla 3al cours mte3ek!");
+                document.getElementById('quiz-card').innerHTML = `
+                    <h2 style="color: var(--accent-color);">🎉 Résultat Final</h2>
+                    <p style="font-size: 28px; font-weight: bold; color: #4ade80; margin: 20px 0;">Score : ${score} / 225 Points</p>
+                    <p style="font-size: 18px; margin-bottom: 25px;">${message}</p>
+                    <button class="btn" style="text-align: center; background: var(--btn-hover);" onclick="location.reload()">🔄 3awed el Quiz</button>
+                `;
+                return;
+            }
+
+            let q = questions[currentIdx];
+            updateTheme(q.theme);
+            timeLeft = q.time;
+            
+            document.getElementById('q-number').innerText = `Question ${currentIdx + 1} / ${questions.length} (${q.points} pts)`;
+            let timerEl = document.getElementById('timer');
+            timerEl.innerText = `⏱️ ${timeLeft}s`;
+            timerEl.style.background = q.time === 10 ? "#ea580c" : (q.time === 20 ? "#7c2aed" : "#be123c");
+            document.getElementById('question').innerText = q.q;
+            
+            let contentHtml = '';
+            if (q.type === 'qcm') {
+                const letters = ['A', 'B', 'C', 'D'];
+                q.options.forEach((opt, idx) => {
+                    contentHtml += `<button class="btn" onclick="checkAnswer(${idx})"><strong>${letters[idx]}.</strong> ${opt}</button>`;
+                });
+            } else {
+                contentHtml = `
+                    <input type="text" id="text-answer" placeholder="Écris ta réponse ici..." autocomplete="off">
+                    <button class="btn" style="text-align: center; background: var(--btn-hover);" onclick="checkTextAnswer()">✅ Valider</button>
+                `;
+            }
+            document.getElementById('options').innerHTML = contentHtml;
+
+            // Timer & Sound logic
+            let stressThreshold = q.time === 20 ? 15 : (q.time === 10 ? 5 : 8);
+
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                timerEl.innerText = `⏱️ ${timeLeft}s`;
+
+                // Sound trigger in final seconds
+                if (timeLeft <= stressThreshold && timeLeft > 0) {
+                    playBeep(800 + (stressThreshold - timeLeft) * 50, 'sawtooth', 0.12);
+                }
+
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    playBeep(200, 'square', 0.4);
+                    currentIdx++;
+                    loadQuestion();
+                }
+            }, 1000);
+        }
+
+        function checkAnswer(selected) {
+            clearInterval(timerInterval);
+            if (selected === questions[currentIdx].correct) {
+                score += questions[currentIdx].points;
+                playBeep(1200, 'sine', 0.15);
+            } else {
+                playBeep(150, 'sawtooth', 0.3);
+            }
+            currentIdx++;
+            loadQuestion();
+        }
+
+        function checkTextAnswer() {
+            clearInterval(timerInterval);
+            let userAns = document.getElementById('text-answer').value.trim().toLowerCase();
+            let q = questions[currentIdx];
+            let isCorrect = q.correctText.some(ans => ans.toLowerCase() === userAns);
+            
+            if (isCorrect) {
+                score += q.points;
+                playBeep(1200, 'sine', 0.15);
+            } else {
+                playBeep(150, 'sawtooth', 0.3);
+            }
+            currentIdx++;
+            loadQuestion();
+        }
+
+        loadQuestion();
+    </script>
+</body>
+</html>
